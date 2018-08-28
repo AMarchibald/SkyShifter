@@ -67,17 +67,25 @@ LevelOne.prototype = {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		cursors = game.input.keyboard.createCursorKeys();
+
+		spaceGreen = game.add.tileSprite(0, 0, 600, 2000, 'sprites', 'BackgroundGreen');
+		spaceBlue = game.add.tileSprite(0, 0, 600, 2000, 'sprites', 'BackgroundBlue');
+		spaceBlue.alpha = 0.0;
 		
 		Player = game.add.sprite(PlayerX, PlayerY, 'sprites', 'Player');
 		game.physics.arcade.enable(Player);
 		Player.body.collideWorldBounds = true;
 		Player.anchor.setTo(0.5);
 
+		Player.animations.add('PlayerMetronome', ['Player', 'Player2']);
+		Player.animations.add('Explosion', Phaser.Animation.generateFrameNames('Explosion', 1, 8), 24);
+
+
 
 		GreenGunnerBullets = game.add.group();
 		GreenGunnerBullets.enableBody = true;
 		GreenGunnerBullets.physicsBodyType = Phaser.Physics.ARCADE;
-		GreenGunnerBullets.createMultiple(30, 'sprites', 'GunnerBullet');
+		GreenGunnerBullets.createMultiple(30, 'sprites', 'GunnerBulletGreen');
 		GreenGunnerBullets.setAll('anchor.x', 0.5);
 		GreenGunnerBullets.setAll('anchor.x', 1);
 		GreenGunnerBullets.setAll('outOfBoundsKill', true);
@@ -94,14 +102,14 @@ LevelOne.prototype = {
 		GreenBomberBullets.setAll('checkWorldBounds', true);
 
 
-		GreenDiveBomberBullets = game.add.group();
-		GreenDiveBomberBullets.enableBody = true;
-		GreenDiveBomberBullets.physicsBodyType = Phaser.Physics.ARCADE;
-		GreenDiveBomberBullets.createMultiple(30, 'sprites', 'GreenDiveBomber');
-		GreenDiveBomberBullets.setAll('anchor.x', 0.5);
-		GreenDiveBomberBullets.setAll('anchor.x', 0.5);
-		GreenDiveBomberBullets.setAll('outOfBoundsKill', true);
-		GreenDiveBomberBullets.setAll('checkWorldBounds', true);
+		DiveBomberDrill = game.add.group();
+		DiveBomberDrill.enableBody = true;
+		DiveBomberDrill.physicsBodyType = Phaser.Physics.ARCADE;
+		DiveBomberDrill.createMultiple(30, 'sprites', 'DiveBomberDrill');
+		DiveBomberDrill.setAll('anchor.x', 0.5);
+		DiveBomberDrill.setAll('anchor.x', 0.5);
+		DiveBomberDrill.setAll('outOfBoundsKill', true);
+		DiveBomberDrill.setAll('checkWorldBounds', true);
 
 
 		GreenGunners = game.add.group();
@@ -122,11 +130,11 @@ LevelOne.prototype = {
 
 		this.createGreenDiveBombers('GreenDiveBomber');
 
-		PlayerBullets = game.add.group();
-		PlayerBullets.enableBody = true;
+		PlayerBulletsGreen = game.add.group();
+		PlayerBulletsGreen.enableBody = true;
 
-		PlayerBulletSpreads = game.add.group();
-		PlayerBulletSpreads.enableBody = true;
+		PlayerBulletsBlue = game.add.group();
+		PlayerBulletsBlue.enableBody = true;
 	},
 
 	update: function(){
@@ -142,6 +150,10 @@ LevelOne.prototype = {
 
 		this.checkInput();
 
+		spaceGreen.tilePosition.y += 5;
+		spaceBlue.tilePosition.y += 10;
+
+		Player.animations.play('PlayerMetronome', 4.6, true);
 
 		if(game.time.now > firingTimer110){
 
@@ -162,18 +174,18 @@ LevelOne.prototype = {
 		}
 
 
-		game.physics.arcade.overlap(GreenGunners, PlayerBullets, this.killGreenGunner, null, this);
-		game.physics.arcade.overlap(GreenGunners, PlayerBulletSpreads, this.killGreenGunner, null, this);
-		game.physics.arcade.overlap(GreenBombers, PlayerBullets, this.killGreenBomber, null, this);
-		game.physics.arcade.overlap(GreenBombers, PlayerBulletSpreads, this.killGreenBomber, null, this);
-		game.physics.arcade.overlap(GreenDiveBombers, PlayerBullets, this.killGreenDiveBomber, null, this);
-		game.physics.arcade.overlap(GreenDiveBombers, PlayerBulletSpreads, this.killGreenDiveBomber, null, this);
-		game.physics.arcade.overlap(GreenDiveBomberBullets, PlayerBullets, this.killGreenDiveBomberBullets, null, this);
-		game.physics.arcade.overlap(GreenDiveBomberBullets, PlayerBulletSpreads, this.killGreenDiveBomberBullets, null, this);
+		game.physics.arcade.overlap(GreenGunners, PlayerBulletsGreen, this.killGreenGunner, null, this);
+		game.physics.arcade.overlap(GreenGunners, PlayerBulletsGreen, this.killGreenGunner, null, this);
+		game.physics.arcade.overlap(GreenBombers, PlayerBulletsGreen, this.killGreenBomber, null, this);
+		game.physics.arcade.overlap(GreenBombers, PlayerBulletsGreen, this.killGreenBomber, null, this);
+		game.physics.arcade.overlap(GreenDiveBombers, PlayerBulletsGreen, this.killGreenDiveBomber, null, this);
+		game.physics.arcade.overlap(GreenDiveBombers, PlayerBulletsGreen, this.killGreenDiveBomber, null, this);
+		game.physics.arcade.overlap(DiveBomberDrill, PlayerBulletsGreen, this.killDiveBomberDrill, null, this);
+		game.physics.arcade.overlap(DiveBomberDrill, PlayerBulletsGreen, this.killDiveBomberDrill, null, this);
 
 		game.physics.arcade.overlap(GreenGunnerBullets, Player, this.killPlayer, null, this);
 		game.physics.arcade.overlap(GreenBomberBullets, Player, this.killPlayer, null, this);
-		game.physics.arcade.overlap(GreenDiveBomberBullets, Player, this.killPlayer, null, this);
+		game.physics.arcade.overlap(DiveBomberDrill, Player, this.killPlayer, null, this);
 	},
 
 
@@ -195,9 +207,12 @@ LevelOne.prototype = {
 		}
 
 
-		if(game.input.keyboard.isDown(TempoShiftUp)){
+		if(cursors.up.isDown){
 
 			if(Tempo == 140){
+
+				game.add.tween(spaceGreen).to( { alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+				game.add.tween(spaceBlue).to( { alpha: 1}, 2000, Phaser.Easing.Linear.None, true);
 
 				if( Rhythm == 44){
 
@@ -213,7 +228,10 @@ LevelOne.prototype = {
 			}	
 		}
 
-		if(game.input.keyboard.isDown(TempoShiftDown)){
+		if(cursors.down.isDown){
+
+			game.add.tween(spaceBlue).to( { alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+			game.add.tween(spaceGreen).to( { alpha: 1}, 2000, Phaser.Easing.Linear.None, true);
 
 			if(Tempo == 174){
 				if( Rhythm == 44){
@@ -274,52 +292,82 @@ LevelOne.prototype = {
 
 		if(this.shoot.isDown){
 
-			if( Rhythm == 44){
-				if(!Fired){
-					for(var i = 0; i < 4; i++){
-						var PlayerBullet = PlayerBullets.create(Player.x, Player.y - (i*15), 'sprites', 'PlayerBullet');
-						PlayerBullet.anchor.setTo(0.5);
+			if( Tempo == 140){
+				if( Rhythm == 44){
+					if(!Fired){
+						for(var i = 0; i < 4; i++){
+							var PlayerBullet = PlayerBulletsGreen.create(Player.x, Player.y - (i*15), 'sprites', 'PlayerBulletGreen');
+							PlayerBullet.anchor.setTo(0.5);
+							game.physics.arcade.enable(PlayerBullet);
+							PlayerBullet.body.velocity.y = -500;
+							Player_Laser.play();
+						}
+						Fired = true;
+					}
+				} else if (Rhythm == 74){
+					if(!Fired){
+
+						var PlayerBullet = PlayerBulletsGreen.create(Player.x - 22, Player.y - 24, 'sprites', 'PlayerBulletGreen');
 						game.physics.arcade.enable(PlayerBullet);
 						PlayerBullet.body.velocity.y = -500;
 						Player_Laser.play();
-					}
-					Fired = true;
+
+						var PlayerBullet = PlayerBulletsGreen.create(Player.x + 18, Player.y - 24, 'sprites', 'PlayerBulletGreen');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
+
+						var PlayerBullet = PlayerBulletsGreen.create(Player.x - 22, Player.y - 8, 'sprites', 'PlayerBulletGreen');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
+
+						var PlayerBullet = PlayerBulletsGreen.create(Player.x + 18, Player.y - 8, 'sprites', 'PlayerBulletGreen');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
+
+						Fired = true;
+					}	
 				}
-			} else if (Rhythm == 74){
-				if(!Fired){
-					bulletY1 = -400/2;
-					bulletY2 = -600/2;
-					bulletX1 = -300/2;
-					bulletX2 = 100/2;
-
-					for(var i = 0; i < 3; i++){
-						var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-						PlayerBulletSpread.anchor.setTo(0.5);
-						game.physics.arcade.enable(PlayerBulletSpread);
-						PlayerBulletSpread.body.velocity.y = bulletY1;
-						PlayerBulletSpread.body.velocity.x = bulletX1;
-						bulletY1 -= 100/2;
-						bulletX1 += 100/2;
+			}else if( Tempo == 174){
+				if( Rhythm == 44){
+					if(!Fired){
+						for(var i = 0; i < 4; i++){
+							var PlayerBullet = PlayerBulletsBlue.create(Player.x, Player.y - (i*15), 'sprites', 'PlayerBulletBlue');
+							PlayerBullet.anchor.setTo(0.5);
+							game.physics.arcade.enable(PlayerBullet);
+							PlayerBullet.body.velocity.y = -500;
+							Player_Laser.play();
+						}
+						Fired = true;
 					}
+				} else if (Rhythm == 74){
+					if(!Fired){
 
-					var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-					PlayerBulletSpread.anchor.setTo(0.5);
-					game.physics.arcade.enable(PlayerBulletSpread);
-					PlayerBulletSpread.body.velocity.y = -700/2;
-					Player_Laser.play();
+						var PlayerBullet = PlayerBulletsBlue.create(Player.x - 22, Player.y - 24, 'sprites', 'PlayerBulletBlue');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
 
-					for(var i = 0; i < 3; i++){
-						var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-						PlayerBulletSpread.anchor.setTo(0.5);
-						game.physics.arcade.enable(PlayerBulletSpread);
-						PlayerBulletSpread.body.velocity.y = bulletY2;
-						PlayerBulletSpread.body.velocity.x = bulletX2;
-						bulletY2 += 100/2;
-						bulletX2 += 100/2;		
-					}
+						var PlayerBullet = PlayerBulletsBlue.create(Player.x + 18, Player.y - 24, 'sprites', 'PlayerBulletBlue');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
 
-					Fired = true;
-				}	
+						var PlayerBullet = PlayerBulletsBlue.create(Player.x - 22, Player.y - 8, 'sprites', 'PlayerBulletBlue');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
+
+						var PlayerBullet = PlayerBulletsBlue.create(Player.x + 18, Player.y - 8, 'sprites', 'PlayerBulletBlue');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
+
+						Fired = true;
+					}	
+				}
 			}
 
 		}
@@ -350,7 +398,7 @@ LevelOne.prototype = {
 
 			var shooter = livingGreenGunners[random];
 
-			GreenGunnerBullet.reset(shooter.body.x, shooter.body.y);
+			GreenGunnerBullet.reset(shooter.body.x + 16, shooter.body.y + 16);
 
 			GreenGunnerBullet.body.velocity.y = 140;
 			Enemy_Laser.play();
@@ -384,7 +432,7 @@ LevelOne.prototype = {
 
 	GreenDiveBomberDives: function(){
 
-		GreenDiveBomberBullet = GreenDiveBomberBullets.getFirstExists(false);
+		GreenDiveBomberBullet = DiveBomberDrill.getFirstExists(false);
 
 		livingGreenDiveBombers.length=0;
 		GreenDiveBombers.forEachAlive(function(GreenDiveBomber){
@@ -412,7 +460,10 @@ LevelOne.prototype = {
 		for(var x = 1; x < 10; x++){
 
 			var GreenGunner = GreenGunners.create(x*60, 250, 'sprites', GunnerType);
-			GreenGunner.anchor.setTo(0.5, 0.5);
+			GreenGunner.anchor.setTo(0.5);
+			GreenGunner.animations.add('GreenMetronome', ['GreenGunner', 'GreenGunner2']);
+			GreenGunner.animations.add('Explosion', Phaser.Animation.generateFrameNames('Explosion', 1, 8), 24);
+			GreenGunner.animations.play('GreenMetronome', 4.6, true);
 			EnemyCount += 1;
 		}
 	},
@@ -422,7 +473,9 @@ LevelOne.prototype = {
 		for(var x = 1; x < 4; x++){
 
 			var GreenBomber = GreenBombers.create(x*150, 150, 'sprites', BomberType);
-			GreenBomber.anchor.setTo(0.5, 0.5);
+			GreenBomber.anchor.setTo(0.5);
+			GreenBomber.animations.add('GreenMetronome', ['GreenBomber', 'GreenBomber2']);
+			GreenBomber.animations.play('GreenMetronome', 4.6, true);
 			EnemyCount += 1;
 		}
 	},
@@ -432,60 +485,56 @@ LevelOne.prototype = {
 		for(var x = 1; x < 7; x++){
 
 			var GreenDiveBomber = GreenDiveBombers.create(x*85, 350, 'sprites', DiveBomberType);
-			GreenDiveBomber.anchor.setTo(0.5, 0.5);
+			GreenDiveBomber.anchor.setTo(0.5);
+			GreenDiveBomber.animations.add('GreenMetronome', ['GreenDiveBomber', 'GreenDiveBomber2']);
+			GreenDiveBomber.animations.play('GreenMetronome', 4.6, true);
 			EnemyCount += 1;
 		}
 	},
 
 	killGreenGunner: function(PlayerShot, GreenGunner){
 
-		if( Tempo == 140){
-			GreenGunner.kill();
-			PlayerShot.kill();
-			Gunner_Explosion.play();
-			EnemyCount -= 1;
-		}
+		GreenGunner.animations.play('Explosion', 24);
+		GreenGunner.kill();
+		PlayerShot.kill();
+		Gunner_Explosion.play();
+		EnemyCount -= 1;
 	},
 
 
 	killGreenBomber: function(PlayerShot, GreenBomber){
 
- 	if( Tempo == 140){
-			GreenBomber.kill();
-			PlayerShot.kill();
-			Bomber_Explosion.play();
-			EnemyCount -= 1;
-		}
+		GreenBomber.kill();
+		PlayerShot.kill();
+		Bomber_Explosion.play();
+		EnemyCount -= 1;
 	},
 
 	killGreenDiveBomber: function(PlayerShot, GreenDiveBomber){
 
-		if( Tempo == 140){
-			GreenDiveBomber.kill();
-			PlayerShot.kill();
-			Diver_Explosion.play();
-			EnemyCount -= 1;
-		}
+		GreenDiveBomber.kill();
+		PlayerShot.kill();
+		Diver_Explosion.play();
+		EnemyCount -= 1;
 	},
 
-	killGreenDiveBomberBullets: function(PlayerShot, GreenDiveBomber){
-
-		if( Tempo == 140){
-			GreenDiveBomber.kill();
-			PlayerShot.kill();
-			Diver_Explosion.play();
-		}
+	killDiveBomberDrill: function(PlayerShot, GreenDiveBomber){
+			
+		GreenDiveBomber.kill();
+		PlayerShot.kill();
+		Diver_Explosion.play();
 	},
 
 	killPlayer: function(EnemyBullet, Player){
 
 		EnemyBullet.kill();
+		Player.animations.play('Explosion');
 		Player.kill();
 		Player_Death.play();
-		Track1A.stop();
-		Track1B.stop();
-		Track2A.stop();
-		Track2B.stop();
+		Track1A.fadeOut(3000, 0);
+		Track1B.fadeOut(3000, 0);
+		Track2A.fadeOut(3000, 0);
+		Track2B.fadeOut(3000, 0);
 		game.state.start('GameOver');
 	}
 }

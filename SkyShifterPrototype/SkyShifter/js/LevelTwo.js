@@ -346,35 +346,12 @@ LevelTwo.prototype = {
 				}
 			} else if (Rhythm == 74){
 				if(!Fired){
-					bulletY1 = -400/2;
-					bulletY2 = -600/2;
-					bulletX1 = -300/2;
-					bulletX2 = 100/2;
 
-					for(var i = 0; i < 3; i++){
-						var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-						PlayerBulletSpread.anchor.setTo(0.5);
-						game.physics.arcade.enable(PlayerBulletSpread);
-						PlayerBulletSpread.body.velocity.y = bulletY1;
-						PlayerBulletSpread.body.velocity.x = bulletX1;
-						bulletY1 -= 100/2;
-						bulletX1 += 100/2;
-					}
-
-					var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-					PlayerBulletSpread.anchor.setTo(0.5);
-					game.physics.arcade.enable(PlayerBulletSpread);
-					PlayerBulletSpread.body.velocity.y = -700/2;
-					Player_Laser.play();
-
-					for(var i = 0; i < 3; i++){
-						var PlayerBulletSpread = PlayerBulletSpreads.create(Player.x, Player.y, 'sprites', 'PlayerBullet');
-						PlayerBulletSpread.anchor.setTo(0.5);
-						game.physics.arcade.enable(PlayerBulletSpread);
-						PlayerBulletSpread.body.velocity.y = bulletY2;
-						PlayerBulletSpread.body.velocity.x = bulletX2;
-						bulletY2 += 100/2;
-						bulletX2 += 100/2;		
+					for(var i = 0; i < 4; i++){
+						var PlayerBullet = PlayerBulletSpreads.create(Player.x - (i*15) + 15, Player.y + 15, 'sprites', 'PlayerBullet');
+						game.physics.arcade.enable(PlayerBullet);
+						PlayerBullet.body.velocity.y = -500;
+						Player_Laser.play();
 					}
 
 					Fired = true;

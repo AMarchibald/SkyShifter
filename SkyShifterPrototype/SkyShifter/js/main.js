@@ -5,14 +5,14 @@ var game = new Phaser.Game(600, 1000);
 var Player, Bomber110, Bomber174, Gunner110, Gunner174, DiveBomber110, DiveBomber174, PlayerX, PlayerY, Tempo, Rhythm;
 var Fired, shoot, FirstBomberX, FirstBomberY, FirstGunnerX, FirstGunnerY, FirstDiveBomberX, FirstDiveBomberY;
 var firingTimer110, livingGreenGunner, GreenGunnerBullet, GreenDiveBomberBullet, EnemyCount;
-var CurrentTrack, shoot2;
+var CurrentTrack, shoot2, spaceGreen, spaceBlue;
 
 const PlayerLeft = Phaser.Keyboard.Left;
 const PlayerRight = Phaser.Keyboard.Right;
-const TempoShiftDown = Phaser.Keyboard.A;
-const TempoShiftUp = Phaser.Keyboard.S;
-const RhythmShiftDown = Phaser.Keyboard.D;
-const RhythmShiftUp = Phaser.Keyboard.F;
+const TempoShiftDown = Phaser.Keyboard.Down;
+const TempoShiftUp = Phaser.Keyboard.Up;
+const RhythmShiftDown = Phaser.Keyboard.A;
+const RhythmShiftUp = Phaser.Keyboard.D;
 
 //state management
 game.state.add('MainMenu', MainMenu);

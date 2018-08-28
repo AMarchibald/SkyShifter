@@ -5,8 +5,11 @@ var MainMenu = function() {
 MainMenu.prototype = {
 	preload: function(){
 		game.load.image('MainMenu', 'assets/img/MainMenu.png');
+
 	},
 	create: function(){
+
+		TitleTrack.play();
 
 		game.add.sprite(0, 0, 'MainMenu');
 	},
