@@ -17,7 +17,9 @@ LevelOne.prototype = {
 		FirstGunnerY = 250;
 		FirstDiveBomberX = 50;
 		FirstDiveBomberY = 350;
-		firingTimer110 = 0;
+		firingTimerGunners = 4360;
+		firingTimerBombers = 4360;
+		firingTimerDivers = 4360; 
 		EnemyCount = 0;
 
 		livingGreenGunners = [];
@@ -27,10 +29,10 @@ LevelOne.prototype = {
 
 
 		game.load.atlas('sprites', 'assets/img/SkyShifter.png', 'assets/img/SkyShifter.json');
-		game.load.audio( '140_44', 'assets/audio/140_44.mp3');
-		game.load.audio( '140_74', 'assets/audio/140_74.mp3');
-		game.load.audio( '174_44', 'assets/audio/174_44.mp3');
-		game.load.audio( '174_74', 'assets/audio/174_74.mp3');
+		//game.load.audio( '140_44', 'assets/audio/140_44.mp3');
+		//game.load.audio( '140_74', 'assets/audio/140_74.mp3');
+		//game.load.audio( '174_44', 'assets/audio/174_44.mp3');
+		//game.load.audio( '174_74', 'assets/audio/174_74.mp3');
 		game.load.audio( 'Gunner_Explosion', 'assets/audio/Gunner_Explosion.wav');
 		game.load.audio( 'Bomber_Explosion', 'assets/audio/Bomber_Explosion.wav');
 		game.load.audio( 'Diver_Explosion', 'assets/audio/Diver_Explosion.wav');
@@ -51,7 +53,7 @@ LevelOne.prototype = {
 		Track1B.play();
 		Track2A.play();
 		Track2B.play();
-		Track1A.play();
+		Track1A.fadeIn(4500, 1);
 
 		Gunner_Explosion = game.add.audio('Gunner_Explosion');
 		Bomber_Explosion = game.add.audio('Bomber_Explosion');
@@ -61,6 +63,13 @@ LevelOne.prototype = {
 		Player_Laser = game.add.audio('Player_Laser');
 		Rhythm_Change_Down = game.add.audio('Rhythm_Change_Down');
 		Rhythm_Change_Up = game.add.audio('Rhythm_Change_Up');
+
+		Gunner_Explosion.allowMultiple = true;
+		Bomber_Explosion.allowMultiple = true;
+		Diver_Explosion.allowMultiple = true;
+		Player_Death.allowMultiple = true;
+		Enemy_Laser.allowMultiple = true;
+		Player_Laser.allowMultiple = true;
 
 		Enemy_Laser.allowMultiple = true;
 
@@ -78,7 +87,7 @@ LevelOne.prototype = {
 		Player.anchor.setTo(0.5);
 
 		Player.animations.add('PlayerMetronome', ['Player', 'Player2']);
-		Player.animations.add('Explosion', Phaser.Animation.generateFrameNames('Explosion', 1, 8), 24);
+		Player.animations.add('PlayerExplosion', ['Explosion1', 'Explosion2', 'Explosion3', 'Explosion4', 'Explosion5', 'Explosion6', 'Explosion7', 'Explosion8']);
 
 
 
@@ -155,21 +164,29 @@ LevelOne.prototype = {
 
 		Player.animations.play('PlayerMetronome', 4.6, true);
 
-		if(game.time.now > firingTimer110){
+		if(game.time.now > firingTimerGunners){
+
+			this.GreenGunnerFires();
+		}
+
+		if(game.time.now > firingTimerBombers){
 
 			this.GreenBomberFires();
-			this.GreenGunnerFires();
+		}
+
+		if(game.time.now > firingTimerDivers){
+
 			this.GreenDiveBomberDives();
 		}
 
 		if(game.time.now > 0){
 			if(EnemyCount == 0){
 
-				game.state.start('Instruction2');
-				Track1A.stop();
-				Track1B.stop();
-				Track2A.stop();
-				Track2B.stop();
+				Track1A.fadeOut(3000, 0);
+				Track1B.fadeOut(3000, 0);
+				Track2A.fadeOut(3000, 0);
+				Track2B.fadeOut(3000, 0);
+				game.time.events.add(Phaser.Timer.SECOND * 3, function() {game.state.start('Instruction2')});
 			}
 		}
 
@@ -207,6 +224,7 @@ LevelOne.prototype = {
 		}
 
 
+		/*
 		if(cursors.up.isDown){
 
 			if(Tempo == 140){
@@ -247,6 +265,7 @@ LevelOne.prototype = {
 				}
 			}
 		}
+		*/
 
 
 		if(game.input.keyboard.isDown(RhythmShiftUp)){
@@ -402,7 +421,7 @@ LevelOne.prototype = {
 
 			GreenGunnerBullet.body.velocity.y = 140;
 			Enemy_Laser.play();
-			firingTimer110 = game.time.now + 545;
+			firingTimerGunners = game.time.now + 545;
 		}
 	},
 
@@ -425,7 +444,7 @@ LevelOne.prototype = {
 			GreenBomberBullet.reset(shooter.body.x, shooter.body.y);
 
 			game.physics.arcade.moveToObject(GreenBomberBullet, Player, 140);
-			firingTimer110 = game.time.now + 2180;
+			firingTimerBombers = game.time.now + 1090;
 		}
 	},
 
@@ -450,45 +469,57 @@ LevelOne.prototype = {
 
 			diver.kill();
 			EnemyCount -= 1;
-			game.physics.arcade.moveToObject(GreenDiveBomberBullet, Player, 110);
-			firingTimer110 = game.time.now + 4360;
+			game.physics.arcade.moveToObject(GreenDiveBomberBullet, Player, 140);
+			firingTimerDivers = game.time.now + 2180;
 		}
 	},
 
 	createGreenGunners: function(GunnerType){
 
-		for(var x = 1; x < 10; x++){
+		for(var i = 0; i < 3; i++){
+			for(var x = 1; x < 10; x++){
 
-			var GreenGunner = GreenGunners.create(x*60, 250, 'sprites', GunnerType);
-			GreenGunner.anchor.setTo(0.5);
-			GreenGunner.animations.add('GreenMetronome', ['GreenGunner', 'GreenGunner2']);
-			GreenGunner.animations.add('Explosion', Phaser.Animation.generateFrameNames('Explosion', 1, 8), 24);
-			GreenGunner.animations.play('GreenMetronome', 4.6, true);
-			EnemyCount += 1;
+				var GreenGunner = GreenGunners.create(x*60, 200 + i*50, 'sprites', GunnerType);
+				GreenGunner.alpha = 0.0;
+				game.add.tween(GreenGunner).to( { alpha: 1}, 2180, Phaser.Easing.Linear.None, true);
+				GreenGunner.anchor.setTo(0.5);
+				GreenGunner.animations.add('GreenMetronome', ['GreenGunner', 'GreenGunner2']);
+				GreenGunner.animations.add('Explosion', Phaser.Animation.generateFrameNames('Explosion', 1, 8), 24);
+				GreenGunner.animations.play('GreenMetronome', 4.6, true);
+				EnemyCount += 1;
+			}
 		}
 	},
 
 	createGreenBombers: function(BomberType){
 
-		for(var x = 1; x < 4; x++){
+		for(var i = 0; i < 2; i++){
+			for(var x = 1; x < 8; x++){
 
-			var GreenBomber = GreenBombers.create(x*150, 150, 'sprites', BomberType);
-			GreenBomber.anchor.setTo(0.5);
-			GreenBomber.animations.add('GreenMetronome', ['GreenBomber', 'GreenBomber2']);
-			GreenBomber.animations.play('GreenMetronome', 4.6, true);
-			EnemyCount += 1;
+				var GreenBomber = GreenBombers.create(x*75, 100 + i*50, 'sprites', BomberType);
+				GreenBomber.alpha = 0.0;
+				game.add.tween(GreenBomber).to( { alpha: 1}, 2180, Phaser.Easing.Linear.None, true);
+				GreenBomber.anchor.setTo(0.5);
+				GreenBomber.animations.add('GreenMetronome', ['GreenBomber', 'GreenBomber2']);
+				GreenBomber.animations.play('GreenMetronome', 4.6, true);
+				EnemyCount += 1;
+			}
 		}
 	},
 
 	createGreenDiveBombers: function(DiveBomberType){
 
-		for(var x = 1; x < 7; x++){
+		for(var i = 0; i < 2; i++){
+			for(var x = 1; x < 7; x++){
 
-			var GreenDiveBomber = GreenDiveBombers.create(x*85, 350, 'sprites', DiveBomberType);
-			GreenDiveBomber.anchor.setTo(0.5);
-			GreenDiveBomber.animations.add('GreenMetronome', ['GreenDiveBomber', 'GreenDiveBomber2']);
-			GreenDiveBomber.animations.play('GreenMetronome', 4.6, true);
-			EnemyCount += 1;
+				var GreenDiveBomber = GreenDiveBombers.create(x*85, 350 + i*50, 'sprites', DiveBomberType);
+				GreenDiveBomber.alpha = 0.0;
+				game.add.tween(GreenDiveBomber).to( { alpha: 1}, 2180, Phaser.Easing.Linear.None, true);
+				GreenDiveBomber.anchor.setTo(0.5);
+				GreenDiveBomber.animations.add('GreenMetronome', ['GreenDiveBomber', 'GreenDiveBomber2']);
+				GreenDiveBomber.animations.play('GreenMetronome', 4.6, true);
+				EnemyCount += 1;
+			}
 		}
 	},
 
@@ -527,15 +558,15 @@ LevelOne.prototype = {
 
 	killPlayer: function(EnemyBullet, Player){
 
+		fired = true;
+		Player.animations.play('PlayerExplosion', 4, false, true);
 		EnemyBullet.kill();
-		Player.animations.play('Explosion');
-		Player.kill();
 		Player_Death.play();
 		Track1A.fadeOut(3000, 0);
 		Track1B.fadeOut(3000, 0);
 		Track2A.fadeOut(3000, 0);
 		Track2B.fadeOut(3000, 0);
-		game.state.start('GameOver');
+		game.time.events.add(Phaser.Timer.SECOND * 3, function() {game.state.start('GameOver')});
 	}
 }
 
