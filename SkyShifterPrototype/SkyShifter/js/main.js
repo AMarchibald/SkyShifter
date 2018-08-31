@@ -6,6 +6,7 @@ var Player, Bomber110, Bomber174, Gunner110, Gunner174, DiveBomber110, DiveBombe
 var Fired, shoot, FirstBomberX, FirstBomberY, FirstGunnerX, FirstGunnerY, FirstDiveBomberX, FirstDiveBomberY;
 var firingTimerGunners, firingTimerBombers, firingTimerDivers, livingGreenGunner, GreenGunnerBullet, GreenDiveBomberBullet, EnemyCount;
 var CurrentTrack, shoot2, spaceGreen, spaceBlue;
+var Score = 0;
 
 const PlayerLeft = Phaser.Keyboard.Left;
 const PlayerRight = Phaser.Keyboard.Right;

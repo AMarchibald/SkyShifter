@@ -6,6 +6,7 @@ var LevelOne = function() {
 LevelOne.prototype = {
 	preload: function(){
 		
+		//setting variable for this game instance
 		PlayerX = game.world.centerX;
 		PlayerY = game.world.height - 150;
 		Tempo = 140;
@@ -22,12 +23,13 @@ LevelOne.prototype = {
 		firingTimerDivers = 4360; 
 		EnemyCount = 0;
 
+		//setting arrays for enemy tracking
 		livingGreenGunners = [];
 		livingGreenBombers = [];
 		livingGreenDiveBombers = [];
 		this.shoot = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-
+		//adding in audio and visual assets
 		game.load.atlas('sprites', 'assets/img/SkyShifter.png', 'assets/img/SkyShifter.json');
 		//game.load.audio( '140_44', 'assets/audio/140_44.mp3');
 		//game.load.audio( '140_74', 'assets/audio/140_74.mp3');
@@ -45,6 +47,7 @@ LevelOne.prototype = {
 
 	create: function(){
 
+		//setting sounds to play at no volume to be ready for swaps
 		Track1A = new Phaser.Sound(this,'140_44', 1.0, true);
 		Track1B = new Phaser.Sound(this, '140_74', 0.0, true);
 		Track2A = new Phaser.Sound(this, '174_44', 0.0, true);
@@ -55,6 +58,7 @@ LevelOne.prototype = {
 		Track2B.play();
 		Track1A.fadeIn(4500, 1);
 
+		//adding appropritate sounds into the game
 		Gunner_Explosion = game.add.audio('Gunner_Explosion');
 		Bomber_Explosion = game.add.audio('Bomber_Explosion');
 		Diver_Explosion = game.add.audio('Diver_Explosion');
@@ -64,33 +68,34 @@ LevelOne.prototype = {
 		Rhythm_Change_Down = game.add.audio('Rhythm_Change_Down');
 		Rhythm_Change_Up = game.add.audio('Rhythm_Change_Up');
 
+		//allowing multiple instances of sounds for multiple enemy kills and shots
 		Gunner_Explosion.allowMultiple = true;
 		Bomber_Explosion.allowMultiple = true;
 		Diver_Explosion.allowMultiple = true;
 		Player_Death.allowMultiple = true;
 		Enemy_Laser.allowMultiple = true;
 		Player_Laser.allowMultiple = true;
-
 		Enemy_Laser.allowMultiple = true;
 
+		//basic physics and cursors declaration
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		cursors = game.input.keyboard.createCursorKeys();
 
+		//Setting backgrounds for swapping
 		spaceGreen = game.add.tileSprite(0, 0, 600, 2000, 'sprites', 'BackgroundGreen');
 		spaceBlue = game.add.tileSprite(0, 0, 600, 2000, 'sprites', 'BackgroundBlue');
 		spaceBlue.alpha = 0.0;
 		
+		//Adding in player and setting animations
 		Player = game.add.sprite(PlayerX, PlayerY, 'sprites', 'Player');
 		game.physics.arcade.enable(Player);
 		Player.body.collideWorldBounds = true;
 		Player.anchor.setTo(0.5);
 
 		Player.animations.add('PlayerMetronome', ['Player', 'Player2']);
-		Player.animations.add('PlayerExplosion', ['Explosion1', 'Explosion2', 'Explosion3', 'Explosion4', 'Explosion5', 'Explosion6', 'Explosion7', 'Explosion8']);
 
-
-
+		//Setting bullet groups for all greeen enemies
 		GreenGunnerBullets = game.add.group();
 		GreenGunnerBullets.enableBody = true;
 		GreenGunnerBullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -99,7 +104,6 @@ LevelOne.prototype = {
 		GreenGunnerBullets.setAll('anchor.x', 1);
 		GreenGunnerBullets.setAll('outOfBoundsKill', true);
 		GreenGunnerBullets.setAll('checkWorldBounds', true);
-
 
 		GreenBomberBullets = game.add.group();
 		GreenBomberBullets.enableBody = true;
@@ -110,7 +114,6 @@ LevelOne.prototype = {
 		GreenBomberBullets.setAll('outOfBoundsKill', true);
 		GreenBomberBullets.setAll('checkWorldBounds', true);
 
-
 		DiveBomberDrill = game.add.group();
 		DiveBomberDrill.enableBody = true;
 		DiveBomberDrill.physicsBodyType = Phaser.Physics.ARCADE;
@@ -120,7 +123,7 @@ LevelOne.prototype = {
 		DiveBomberDrill.setAll('outOfBoundsKill', true);
 		DiveBomberDrill.setAll('checkWorldBounds', true);
 
-
+		//Setting groups for all Green enemies and starting initial create function
 		GreenGunners = game.add.group();
 		GreenGunners.enableBody = true;
 		GreenGunners.physicsBodyType = Phaser.Physics.ARCADE;
@@ -139,11 +142,15 @@ LevelOne.prototype = {
 
 		this.createGreenDiveBombers('GreenDiveBomber');
 
+		//setting player bullet groups
 		PlayerBulletsGreen = game.add.group();
 		PlayerBulletsGreen.enableBody = true;
 
 		PlayerBulletsBlue = game.add.group();
 		PlayerBulletsBlue.enableBody = true;
+
+		//setting U.I. for this game instance
+		rhythmText = game.add.text(16, 16, 'Rhythm: ' + Rhythm, { fontSize: '32px', fill:'#FFFFFF'});
 	},
 
 	update: function(){
@@ -153,17 +160,22 @@ LevelOne.prototype = {
 		//Track1B.loopFull(0.0);
 		//Track2B.loopFull(0.0);
 
-		console.log(Tempo);
+		//logs for game info
+		//console.log(Tempo);
 		//console.log(Rhythm);
-		console.log(EnemyCount);
+		//console.log(EnemyCount);
 
+		//setting checkInput for player controls
 		this.checkInput();
 
+		//starting background scrolling
 		spaceGreen.tilePosition.y += 5;
 		spaceBlue.tilePosition.y += 10;
 
+		//setting Player animation
 		Player.animations.play('PlayerMetronome', 4.6, true);
 
+		//setting separate firing timers for enemies
 		if(game.time.now > firingTimerGunners){
 
 			this.GreenGunnerFires();
@@ -179,6 +191,7 @@ LevelOne.prototype = {
 			this.GreenDiveBomberDives();
 		}
 
+		//checking for level pass parameters
 		if(game.time.now > 0){
 			if(EnemyCount == 0){
 
@@ -190,16 +203,13 @@ LevelOne.prototype = {
 			}
 		}
 
-
-		game.physics.arcade.overlap(GreenGunners, PlayerBulletsGreen, this.killGreenGunner, null, this);
+		//collision detection for player bullets on enemy
 		game.physics.arcade.overlap(GreenGunners, PlayerBulletsGreen, this.killGreenGunner, null, this);
 		game.physics.arcade.overlap(GreenBombers, PlayerBulletsGreen, this.killGreenBomber, null, this);
-		game.physics.arcade.overlap(GreenBombers, PlayerBulletsGreen, this.killGreenBomber, null, this);
 		game.physics.arcade.overlap(GreenDiveBombers, PlayerBulletsGreen, this.killGreenDiveBomber, null, this);
-		game.physics.arcade.overlap(GreenDiveBombers, PlayerBulletsGreen, this.killGreenDiveBomber, null, this);
-		game.physics.arcade.overlap(DiveBomberDrill, PlayerBulletsGreen, this.killDiveBomberDrill, null, this);
 		game.physics.arcade.overlap(DiveBomberDrill, PlayerBulletsGreen, this.killDiveBomberDrill, null, this);
 
+		//collision detection for enemy bullets on player
 		game.physics.arcade.overlap(GreenGunnerBullets, Player, this.killPlayer, null, this);
 		game.physics.arcade.overlap(GreenBomberBullets, Player, this.killPlayer, null, this);
 		game.physics.arcade.overlap(DiveBomberDrill, Player, this.killPlayer, null, this);
@@ -208,7 +218,7 @@ LevelOne.prototype = {
 
 	checkInput: function(){
 
-
+		//setting movement controls for player
 		if(cursors.left.isDown){
 
 			Player.body.velocity.x = -300;
@@ -267,7 +277,7 @@ LevelOne.prototype = {
 		}
 		*/
 
-
+		//setting rhythm change controls for player
 		if(game.input.keyboard.isDown(RhythmShiftUp)){
 
 			if(Rhythm == 44){
@@ -277,12 +287,14 @@ LevelOne.prototype = {
 					Rhythm_Change_Up.play();
 					Track1B.fadeIn(2000, 1);
 					Rhythm = 74;
+					rhythmText.text = 'Rhythm: ' + Rhythm;
 				}else if( Tempo == 174){
 
 					Track2A.fadeOut(1000, 0);
 					Rhythm_Change_Up.play();
 					Track2B.fadeIn(2000, 1);
 					Rhythm = 74;
+					rhythmText.text = 'Rhythm: ' + Rhythm;
 				}
 			}
 		}
@@ -296,19 +308,21 @@ LevelOne.prototype = {
 					Rhythm_Change_Down.play();
 					Track1A.fadeIn(2000, 1);
 					Rhythm = 44;
+					rhythmText.text = 'Rhythm: ' + Rhythm;
 				}else if( Tempo == 174){
 
 					Track2B.fadeOut(1000, 0);
 					Rhythm_Change_Down.play();
 					Track2A.fadeIn(2000, 1);
-					Rhythm = 44;		
+					Rhythm = 44;
+					rhythmText.text = 'Rhythm: ' + Rhythm;
 				}
 			}
 		}
 
 
 
-
+		//setting alternate firing modes for player based on rhythm and tempo
 		if(this.shoot.isDown){
 
 			if( Tempo == 140){
@@ -391,6 +405,7 @@ LevelOne.prototype = {
 
 		}
 
+		//preventing infinite firing by holding down space bar
 		if(this.shoot.isUp){
 
 			Fired = false;
@@ -400,6 +415,7 @@ LevelOne.prototype = {
 
 	},
 
+	//setting Green enemy firing patterns using Phaser weapon systems
 	GreenGunnerFires: function(){
 
 		GreenGunnerBullet = GreenGunnerBullets.getFirstExists(false);
@@ -474,6 +490,7 @@ LevelOne.prototype = {
 		}
 	},
 
+	//Creating rows of each Green enemy across top of screen using double for loops
 	createGreenGunners: function(GunnerType){
 
 		for(var i = 0; i < 3; i++){
@@ -523,6 +540,7 @@ LevelOne.prototype = {
 		}
 	},
 
+	//setting parameters for what to do if a Green enemy of any type dies
 	killGreenGunner: function(PlayerShot, GreenGunner){
 
 		GreenGunner.animations.play('Explosion', 24);
@@ -556,6 +574,7 @@ LevelOne.prototype = {
 		Diver_Explosion.play();
 	},
 
+	//setting parameters for what to do if the player is hit
 	killPlayer: function(EnemyBullet, Player){
 
 		fired = true;
